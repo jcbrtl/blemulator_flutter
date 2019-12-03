@@ -23,9 +23,9 @@ class PeripheralRowView extends StatelessWidget {
           color: CustomColors.rowCardBackground,
           child: ListTile(
             leading: _buildListTileLeading(),
-            title: Text(_peripheral.name),
+            title: Text(_peripheral.name ?? 'Unknown peripheral'),
             subtitle: Text(
-              _peripheral.id,
+              _peripheral.id ?? 'Unknown ID',
               maxLines: 1,
             ),
             trailing: _buildListTileTrailing(),

@@ -58,8 +58,7 @@ class PeripheralListBloc
       }
     } else {
       updatedPeripherals = Map.from(state.peripherals);
-      updatedPeripherals
-          .addEntries([MapEntry(peripheralId, event.peripheral)]);
+      updatedPeripherals.addEntries([MapEntry(peripheralId, event.peripheral)]);
     }
     yield PeripheralListState(
         peripherals: updatedPeripherals,

@@ -25,6 +25,8 @@ class BleAdapter {
   BleManager _bleManager;
   Blemulator _blemulator;
 
+  Map<String, ScanResult> _scanResults = {};
+
   factory BleAdapter(BleManager bleManager, Blemulator blemulator) {
     if (_instance == null) {
       _instance = BleAdapter._internal(bleManager, blemulator);
@@ -35,32 +37,50 @@ class BleAdapter {
   }
 
   BleAdapter._internal(this._bleManager, this._blemulator) {
-    _setupSimulation();
+//    _setupSimulation();
     _bleManager.createClient();
   }
 
   Stream<BlePeripheral> startPeripheralScan() {
-    return _bleManager.startPeripheralScan().transform(
-      new StreamTransformer<ScanResult, BlePeripheral>.fromHandlers(
-        handleData: (ScanResult scanResult, EventSink<BlePeripheral> sink) {
-          if (scanResult.advertisementData.localName != null) {
-            final peripheral = BlePeripheral(
-              scanResult.peripheral.name,
-              scanResult.peripheral.identifier,
-              scanResult.rssi,
-              false,
-              BlePeripheralCategoryResolver.categoryForName(
+    return _bleManager.startPeripheralScan().asyncMap((scanResult) async {
+      _scanResults.update(
+        scanResult.peripheral.identifier,
+        (_) => scanResult,
+        ifAbsent: () => scanResult,
+      );
+
+      // TODO: - Decide how to handle connection
+      // Maybe add connectionObservers for each scanResult?
+      bool isConnected = await scanResult.peripheral.isConnected();
+
+      final peripheral = BlePeripheral(
+        scanResult.peripheral.name ??
+            scanResult.advertisementData.localName ??
+            'Unknown peripheral',
+        scanResult.peripheral.identifier,
+        scanResult.rssi,
+        isConnected,
+        BlePeripheralCategoryResolver.categoryForName(
                   scanResult.peripheral.name),
-            );
-            sink.add(peripheral);
-          }
-        },
-      ),
-    );
+      );
+      return peripheral;
+    });
   }
 
   Future<void> stopPeripheralScan() {
     return _bleManager.stopPeripheralScan();
+  }
+
+  Future<void> connectToPeripheral(String peripheralId) {
+    return _scanResults[peripheralId].peripheral.connect();
+  }
+
+  Future<void> disconnectFromPeripheral(String peripheralId) {
+    return _scanResults[peripheralId].peripheral.disconnectOrCancelConnection();
+  }
+
+  Future<bool> isPeripheralConnected(String peripheralId) {
+    return _scanResults[peripheralId].peripheral.isConnected();
   }
 
   void _setupSimulation() {

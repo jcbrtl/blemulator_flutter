@@ -20,25 +20,37 @@ class PeripheralDetailsBloc
     PeripheralDetailsEvent event,
   ) async* {
     if (event is ConnectToPeripheral) {
-      yield _mapConnectToPeripheralToState(event);
+      yield await _mapConnectToPeripheralToState(event);
     } else if (event is DisconnectFromPeripheral) {
-      yield _mapDisconnectFromPeripheralToState(event);
+      yield await _mapDisconnectFromPeripheralToState(event);
     }
   }
 
-  PeripheralDetailsState _mapConnectToPeripheralToState(
-      ConnectToPeripheral event) {
-    // TODO: call bleAdapter to do the logic
-    final peripheral = BlePeripheral(state.peripheral.name, state.peripheral.id,
-        state.peripheral.rssi, !state.peripheral.isConnected);
-    return PeripheralDetailsState(peripheral: peripheral);
+  Future<PeripheralDetailsState> _mapConnectToPeripheralToState(
+      ConnectToPeripheral event) async {
+    try {
+      await _bleAdapter.connectToPeripheral(state.peripheral.id);
+      final isConnected =
+          await _bleAdapter.isPeripheralConnected(state.peripheral.id);
+
+      final peripheral = state.peripheral.copyWith(isConnected: isConnected);
+      return PeripheralDetailsState(peripheral: peripheral);
+    } on Error {
+      // TODO: - Error handling
+    }
   }
 
-  PeripheralDetailsState _mapDisconnectFromPeripheralToState(
-      DisconnectFromPeripheral event) {
-    // TODO: call bleAdapter to do the logic
-    final peripheral = BlePeripheral(state.peripheral.name, state.peripheral.id,
-        state.peripheral.rssi, !state.peripheral.isConnected);
-    return PeripheralDetailsState(peripheral: peripheral);
+  Future<PeripheralDetailsState> _mapDisconnectFromPeripheralToState(
+      DisconnectFromPeripheral event) async {
+    try {
+      await _bleAdapter.disconnectFromPeripheral(state.peripheral.id);
+      final isConnected =
+          await _bleAdapter.isPeripheralConnected(state.peripheral.id);
+
+      final peripheral = state.peripheral.copyWith(isConnected: isConnected);
+      return PeripheralDetailsState(peripheral: peripheral);
+    } on Error {
+      // TODO: - Error handling
+    }
   }
 }
