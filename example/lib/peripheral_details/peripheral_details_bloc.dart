@@ -18,5 +18,27 @@ class PeripheralDetailsBloc
   @override
   Stream<PeripheralDetailsState> mapEventToState(
     PeripheralDetailsEvent event,
-  ) async* {}
+  ) async* {
+    if (event is ConnectToPeripheral) {
+      yield _mapConnectToPeripheralToState(event);
+    } else if (event is DisconnectFromPeripheral) {
+      yield _mapDisconnectFromPeripheralToState(event);
+    }
+  }
+
+  PeripheralDetailsState _mapConnectToPeripheralToState(
+      ConnectToPeripheral event) {
+    // TODO: call bleAdapter to do the logic
+    final peripheral = BlePeripheral(state.peripheral.name, state.peripheral.id,
+        state.peripheral.rssi, !state.peripheral.isConnected);
+    return PeripheralDetailsState(peripheral: peripheral);
+  }
+
+  PeripheralDetailsState _mapDisconnectFromPeripheralToState(
+      DisconnectFromPeripheral event) {
+    // TODO: call bleAdapter to do the logic
+    final peripheral = BlePeripheral(state.peripheral.name, state.peripheral.id,
+        state.peripheral.rssi, !state.peripheral.isConnected);
+    return PeripheralDetailsState(peripheral: peripheral);
+  }
 }

@@ -10,7 +10,7 @@ class BlePeripheral extends Equatable {
   BlePeripheral(this.name, this.id, this.rssi, this.isConnected, this.category);
 
   @override
-  List<Object> get props => [name, id];
+  List<Object> get props => [name, id, rssi, isConnected];
 }
 
 enum BlePeripheralCategory { sensorTag, other }

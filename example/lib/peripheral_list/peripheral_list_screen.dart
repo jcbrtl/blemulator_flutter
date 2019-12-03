@@ -1,3 +1,4 @@
+import 'package:blemulator_example/model/ble_peripheral.dart';
 import 'package:blemulator_example/peripheral_list/bloc.dart';
 import 'package:blemulator_example/peripheral_list/components/peripheral_row_view.dart';
 import 'package:flutter/material.dart';
@@ -38,10 +39,11 @@ class PeripheralListScreen extends StatelessWidget {
           return previousState.peripherals != state.peripherals;
         },
         builder: (context, state) {
+          List<BlePeripheral> peripherals = state.peripherals.values.toList();
           return ListView.builder(
-            itemCount: state.peripherals.length,
+            itemCount: peripherals.length,
             itemBuilder: (context, index) {
-              return PeripheralRowView(state.peripherals[index]);
+              return PeripheralRowView(peripherals[index]);
             },
             padding: EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
           );
