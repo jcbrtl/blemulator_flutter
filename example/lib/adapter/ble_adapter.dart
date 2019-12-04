@@ -42,28 +42,13 @@ class BleAdapter {
   }
 
   Stream<BlePeripheral> startPeripheralScan() {
-    return _bleManager.startPeripheralScan().asyncMap((scanResult) async {
+    return _bleManager.startPeripheralScan().map((scanResult) {
       _scanResults.update(
         scanResult.peripheral.identifier,
         (_) => scanResult,
         ifAbsent: () => scanResult,
       );
-
-      // TODO: - Decide how to handle connection
-      // Maybe add connectionObservers for each scanResult?
-      bool isConnected = await scanResult.peripheral.isConnected();
-
-      final peripheral = BlePeripheral(
-        scanResult.peripheral.name ??
-            scanResult.advertisementData.localName ??
-            'Unknown peripheral',
-        scanResult.peripheral.identifier,
-        scanResult.rssi,
-        isConnected,
-        BlePeripheralCategoryResolver.categoryForName(
-                  scanResult.peripheral.name),
-      );
-      return peripheral;
+      return BlePeripheral.fromScanResult(scanResult);;
     });
   }
 

@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter_ble_lib/flutter_ble_lib.dart';
 
 class BlePeripheral extends Equatable {
   final String name;
@@ -10,13 +11,29 @@ class BlePeripheral extends Equatable {
   BlePeripheral(this.name, this.id, this.rssi, this.isConnected, this.category);
 
   BlePeripheral copyWith(
-      {String name, String, id, int rssi, bool isConnected, BlePeripheralCategory category}) {
+      {String name,
+      String id,
+      int rssi,
+      bool isConnected,
+      BlePeripheralCategory category}) {
     return BlePeripheral(
       name ?? this.name,
       id ?? this.id,
       rssi ?? this.rssi,
       isConnected ?? this.isConnected,
       category ?? this.category,
+    );
+  }
+
+  factory BlePeripheral.fromScanResult(ScanResult scanResult) {
+    return BlePeripheral(
+      scanResult.peripheral.name ??
+          scanResult.advertisementData.localName ??
+          'Unknown peripheral',
+      scanResult.peripheral.identifier,
+      scanResult.rssi,
+      false,
+      BlePeripheralCategoryResolver.categoryForName(scanResult.peripheral.name),
     );
   }
 
