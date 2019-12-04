@@ -5,22 +5,23 @@ class BlePeripheral extends Equatable {
   final String name;
   final String id;
   final int rssi;
-  final bool isConnected;
+  final PeripheralConnectionState connectionState;
   final BlePeripheralCategory category;
 
-  BlePeripheral(this.name, this.id, this.rssi, this.isConnected, this.category);
+  BlePeripheral(
+      this.name, this.id, this.rssi, this.connectionState, this.category);
 
   BlePeripheral copyWith(
       {String name,
       String id,
       int rssi,
-      bool isConnected,
+      PeripheralConnectionState connectionState,
       BlePeripheralCategory category}) {
     return BlePeripheral(
       name ?? this.name,
       id ?? this.id,
       rssi ?? this.rssi,
-      isConnected ?? this.isConnected,
+      connectionState ?? this.connectionState,
       category ?? this.category,
     );
   }
@@ -32,13 +33,13 @@ class BlePeripheral extends Equatable {
           'Unknown peripheral',
       scanResult.peripheral.identifier,
       scanResult.rssi,
-      false,
+      PeripheralConnectionState.disconnected,
       BlePeripheralCategoryResolver.categoryForName(scanResult.peripheral.name),
     );
   }
 
   @override
-  List<Object> get props => [name, id, rssi, isConnected];
+  List<Object> get props => [name, id, rssi, connectionState];
 }
 
 enum BlePeripheralCategory { sensorTag, other }

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:blemulator_example/adapter/ble_adapter.dart';
 import 'package:blemulator_example/model/ble_peripheral.dart';
 import 'package:bloc/bloc.dart';
+import 'package:flutter_ble_lib/flutter_ble_lib.dart';
 import './bloc.dart';
 
 class PeripheralDetailsBloc
@@ -30,10 +31,8 @@ class PeripheralDetailsBloc
       ConnectToPeripheral event) async {
     try {
       await _bleAdapter.connectToPeripheral(state.peripheral.id);
-      final isConnected =
-          await _bleAdapter.isPeripheralConnected(state.peripheral.id);
-
-      final peripheral = state.peripheral.copyWith(isConnected: isConnected);
+      final peripheral = state.peripheral
+          .copyWith(connectionState: PeripheralConnectionState.connected);
       return PeripheralDetailsState(peripheral: peripheral);
     } on Error {
       // TODO: - Error handling
@@ -44,10 +43,8 @@ class PeripheralDetailsBloc
       DisconnectFromPeripheral event) async {
     try {
       await _bleAdapter.disconnectFromPeripheral(state.peripheral.id);
-      final isConnected =
-          await _bleAdapter.isPeripheralConnected(state.peripheral.id);
-
-      final peripheral = state.peripheral.copyWith(isConnected: isConnected);
+      final peripheral = state.peripheral
+          .copyWith(connectionState: PeripheralConnectionState.disconnected);
       return PeripheralDetailsState(peripheral: peripheral);
     } on Error {
       // TODO: - Error handling

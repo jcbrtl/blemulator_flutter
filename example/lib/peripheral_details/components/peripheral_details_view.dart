@@ -2,6 +2,7 @@ import 'package:blemulator_example/peripheral_details/bloc.dart';
 import 'package:blemulator_example/peripheral_details/components/property_row.dart';
 import 'package:blemulator_example/styles/custom_text_style.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_ble_lib/flutter_ble_lib.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class PeripheralDetailsView extends StatelessWidget {
@@ -41,26 +42,58 @@ class PeripheralDetailsView extends StatelessWidget {
     );
   }
 
-  Widget _buildConnectionButtons(BuildContext context, PeripheralDetailsBloc peripheralDetailsBloc) {
+  Widget _buildConnectionButtons(
+      BuildContext context, PeripheralDetailsBloc peripheralDetailsBloc) {
     return BlocBuilder<PeripheralDetailsBloc, PeripheralDetailsState>(
       builder: (context, state) {
         return FlatButton(
           child: Text(
-            state.peripheral.isConnected ? 'Disconnect' : 'Connect',
+            _connectionButtonText(state.peripheral.connectionState),
             style:
-            CustomTextStyle.cardTitleButton.copyWith(color: Colors.white),
+                CustomTextStyle.cardTitleButton.copyWith(color: Colors.white),
           ),
           color: Theme.of(context).primaryColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18.0),
           ),
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          onPressed: () => state.peripheral.isConnected
-              ? _disconnectFromPeripheral(peripheralDetailsBloc)
-              : _connectToPeripheral(peripheralDetailsBloc),
+          onPressed: _onConnectionButtonPressed(
+              state.peripheral.connectionState, peripheralDetailsBloc),
         );
       },
     );
+  }
+
+  String _connectionButtonText(PeripheralConnectionState connectionState) {
+    switch (connectionState) {
+      case PeripheralConnectionState.connected:
+      case PeripheralConnectionState.connecting:
+        return 'Disconnect';
+      case PeripheralConnectionState.disconnected:
+      case PeripheralConnectionState.disconnecting:
+        return 'Connect';
+      default:
+        return '';
+      // default case is needed to avoid flutter analyzer warning
+      // even though switch is in fact exhaustive
+    }
+  }
+
+  VoidCallback _onConnectionButtonPressed(
+      PeripheralConnectionState connectionState,
+      PeripheralDetailsBloc peripheralDetailsBloc) {
+    switch (connectionState) {
+      case PeripheralConnectionState.connected:
+      case PeripheralConnectionState.connecting:
+        return () => _disconnectFromPeripheral(peripheralDetailsBloc);
+      case PeripheralConnectionState.disconnected:
+      case PeripheralConnectionState.disconnecting:
+        return () => _connectToPeripheral(peripheralDetailsBloc);
+      default:
+        return () => {};
+      // default case is needed to avoid flutter analyzer warning
+      // even though switch is in fact exhaustive
+    }
   }
 
   void _connectToPeripheral(PeripheralDetailsBloc peripheralDetailsBloc) {
