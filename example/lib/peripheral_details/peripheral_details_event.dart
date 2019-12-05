@@ -12,7 +12,12 @@ class ConnectToPeripheral extends PeripheralDetailsEvent {
 
 class DisconnectFromPeripheral extends PeripheralDetailsEvent {
   @override
-  List<Object> get props => null;
+  List<Object> get props => [];
+}
+
+class CheckConnectionState extends PeripheralDetailsEvent {
+  @override
+  List<Object> get props => [];
 }
 
 class ConnectionStateUpdated extends PeripheralDetailsEvent {

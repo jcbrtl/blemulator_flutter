@@ -37,9 +37,10 @@ class PeripheralDetailsView extends StatelessWidget {
             showDialog(
               context: context,
               builder: (context) {
+                final errorState = state as PeripheralDetailsErrorState;
                 return SimpleDialog(
                   title:
-                      Text((state as PeripheralDetailsErrorState).errorMessage),
+                      Text(errorState.errorMessage),
                   children: <Widget>[
                     SimpleDialogOption(
                       child: Text('OK'),

@@ -19,5 +19,5 @@ class PeripheralDetailsErrorState extends PeripheralDetailsState {
       : super(peripheral: peripheral);
 
   @override
-  List<Object> get props => [];
+  List<Object> get props => [peripheral, errorMessage];
 }

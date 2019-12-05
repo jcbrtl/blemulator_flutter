@@ -12,20 +12,12 @@ class PeripheralDetailsBloc
   StreamSubscription _peripheralConnectionStateSubscription;
 
   PeripheralDetailsBloc(this._bleAdapter, this._chosenPeripheral) {
-    _updatePeripheralConnectionState();
     _peripheralConnectionStateSubscription = _bleAdapter
         .observePeripheralConnection(_chosenPeripheral.id)
         .listen((connectionState) {
       add(ConnectionStateUpdated(connectionState));
     });
-  }
-
-  void _updatePeripheralConnectionState() async {
-    bool isConnected =
-        await _bleAdapter.isPeripheralConnected(_chosenPeripheral.id);
-    add(ConnectionStateUpdated(isConnected
-        ? PeripheralConnectionState.connected
-        : PeripheralConnectionState.disconnected));
+    add(CheckConnectionState());
   }
 
   @override
@@ -40,6 +32,8 @@ class PeripheralDetailsBloc
       yield await _mapConnectToPeripheralToState(event);
     } else if (event is DisconnectFromPeripheral) {
       yield await _mapDisconnectFromPeripheralToState(event);
+    } else if (event is CheckConnectionState) {
+      yield await _mapCheckConnectionState(event);
     } else if (event is ConnectionStateUpdated) {
       yield _mapConnectionStateUpdateToState(event);
     }
@@ -59,6 +53,20 @@ class PeripheralDetailsBloc
       DisconnectFromPeripheral event) async {
     try {
       await _bleAdapter.disconnectFromPeripheral(state.peripheral.id);
+      return PeripheralDetailsState(peripheral: state.peripheral);
+    } on BleError catch (bleError) {
+      return _mapBleErrorToState(bleError);
+    }
+  }
+
+  Future<PeripheralDetailsState> _mapCheckConnectionState(
+      CheckConnectionState event) async {
+    try {
+      bool isConnected =
+          await _bleAdapter.isPeripheralConnected(_chosenPeripheral.id);
+      add(ConnectionStateUpdated(isConnected
+          ? PeripheralConnectionState.connected
+          : PeripheralConnectionState.disconnected));
       return PeripheralDetailsState(peripheral: state.peripheral);
     } on BleError catch (bleError) {
       return _mapBleErrorToState(bleError);
