@@ -1,6 +1,7 @@
 import 'package:blemulator_example/peripheral_details/bloc.dart';
 import 'package:blemulator_example/peripheral_details/components/property_row.dart';
 import 'package:blemulator_example/styles/custom_text_style.dart';
+import 'package:blemulator_example/util/peripheral_connection_state_stringifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_ble_lib/flutter_ble_lib.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,18 +12,33 @@ class PeripheralDetailsView extends StatelessWidget {
     final PeripheralDetailsBloc peripheralDetailsBloc =
         BlocProvider.of<PeripheralDetailsBloc>(context);
 
-    return CustomScrollView(
-      slivers: <Widget>[
-        SliverSafeArea(
-          top: false,
-          sliver: SliverPadding(
-            padding: const EdgeInsets.all(8.0),
-            sliver: SliverToBoxAdapter(
-              child: _buildPeripheralProperties(peripheralDetailsBloc),
+    return BlocListener<PeripheralDetailsBloc, PeripheralDetailsState>(
+      condition: (previousState, state) {
+        return previousState.peripheral.connectionState !=
+            state.peripheral.connectionState;
+      },
+      listener: (context, state) {
+        Scaffold.of(context).removeCurrentSnackBar();
+        Scaffold.of(context).showSnackBar(
+          SnackBar(
+            content: Text(PeripheralConnectionStateStringifier.description(
+                state.peripheral.connectionState)),
+          ),
+        );
+      },
+      child: CustomScrollView(
+        slivers: <Widget>[
+          SliverSafeArea(
+            top: false,
+            sliver: SliverPadding(
+              padding: const EdgeInsets.all(8.0),
+              sliver: SliverToBoxAdapter(
+                child: _buildPeripheralProperties(peripheralDetailsBloc),
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -35,7 +51,7 @@ class PeripheralDetailsView extends StatelessWidget {
           titleIcon: Icons.perm_device_information,
           titleColor: Theme.of(context).primaryColor,
           value: state.peripheral.id,
-          rowAccessory: _buildConnectionButtons(context, peripheralDetailsBloc),
+          titleAccessory: _buildConnectionButtons(context, peripheralDetailsBloc),
         );
       },
     );
