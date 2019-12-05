@@ -68,6 +68,10 @@ class BleAdapter {
     return _scanResults[peripheralId].peripheral.isConnected();
   }
 
+  Stream<PeripheralConnectionState> observePeripheralConnection(String peripheralId) {
+    return _scanResults[peripheralId].peripheral.observeConnectionState(emitCurrentValue: true);
+  }
+
   void _setupSimulation() {
     _blemulator.addSimulatedPeripheral(SensorTag());
     _blemulator.addSimulatedPeripheral(SensorTag(id: "different id"));
