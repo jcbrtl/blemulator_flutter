@@ -9,12 +9,23 @@ class PeripheralDetailsBloc
     extends Bloc<PeripheralDetailsEvent, PeripheralDetailsState> {
   BleAdapter _bleAdapter;
   final BlePeripheral _chosenPeripheral;
-  StreamSubscription _peripheralConnectionSubscription;
+  StreamSubscription _peripheralConnectionStateSubscription;
 
   PeripheralDetailsBloc(this._bleAdapter, this._chosenPeripheral) {
-    _peripheralConnectionSubscription = _bleAdapter
+    _updatePeripheralConnectionState();
+    _peripheralConnectionStateSubscription = _bleAdapter
         .observePeripheralConnection(_chosenPeripheral.id)
-        .listen((connectionState) {});
+        .listen((connectionState) {
+      add(ConnectionStateUpdated(connectionState));
+    });
+  }
+
+  void _updatePeripheralConnectionState() async {
+    bool isConnected =
+        await _bleAdapter.isPeripheralConnected(_chosenPeripheral.id);
+    add(ConnectionStateUpdated(isConnected
+        ? PeripheralConnectionState.connected
+        : PeripheralConnectionState.disconnected));
   }
 
   @override
@@ -29,6 +40,8 @@ class PeripheralDetailsBloc
       yield await _mapConnectToPeripheralToState(event);
     } else if (event is DisconnectFromPeripheral) {
       yield await _mapDisconnectFromPeripheralToState(event);
+    } else if (event is ConnectionStateUpdated) {
+      yield _mapConnectionStateUpdateToState(event);
     }
   }
 
@@ -36,9 +49,7 @@ class PeripheralDetailsBloc
       ConnectToPeripheral event) async {
     try {
       await _bleAdapter.connectToPeripheral(state.peripheral.id);
-      final peripheral = state.peripheral
-          .copyWith(connectionState: PeripheralConnectionState.connected);
-      return PeripheralDetailsState(peripheral: peripheral);
+      return PeripheralDetailsState(peripheral: state.peripheral);
     } on Error {
       // TODO: - Error handling
     }
@@ -48,17 +59,22 @@ class PeripheralDetailsBloc
       DisconnectFromPeripheral event) async {
     try {
       await _bleAdapter.disconnectFromPeripheral(state.peripheral.id);
-      final peripheral = state.peripheral
-          .copyWith(connectionState: PeripheralConnectionState.disconnected);
-      return PeripheralDetailsState(peripheral: peripheral);
+      return PeripheralDetailsState(peripheral: state.peripheral);
     } on Error {
       // TODO: - Error handling
     }
   }
 
+  PeripheralDetailsState _mapConnectionStateUpdateToState(
+      ConnectionStateUpdated event) {
+    return PeripheralDetailsState(
+        peripheral:
+            state.peripheral.copyWith(connectionState: event.connectionState));
+  }
+
   @override
   Future<void> close() {
-    _peripheralConnectionSubscription.cancel();
+    _peripheralConnectionStateSubscription.cancel();
     return super.close();
   }
 }

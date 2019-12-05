@@ -73,7 +73,7 @@ class BleAdapter {
       String peripheralId) {
     return _scanResults[peripheralId]
         .peripheral
-        .observeConnectionState(emitCurrentValue: true);
+        .observeConnectionState();
   }
 
   void _setupSimulation() {
