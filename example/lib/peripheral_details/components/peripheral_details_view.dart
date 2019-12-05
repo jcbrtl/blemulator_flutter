@@ -72,10 +72,10 @@ class PeripheralDetailsView extends StatelessWidget {
       case PeripheralConnectionState.disconnected:
       case PeripheralConnectionState.disconnecting:
         return 'Connect';
-      default:
-        return '';
       // default case is needed to avoid flutter analyzer warning
       // even though switch is in fact exhaustive
+      default:
+        return null;
     }
   }
 
@@ -89,10 +89,10 @@ class PeripheralDetailsView extends StatelessWidget {
       case PeripheralConnectionState.disconnected:
       case PeripheralConnectionState.disconnecting:
         return () => _connectToPeripheral(peripheralDetailsBloc);
-      default:
-        return () => {};
       // default case is needed to avoid flutter analyzer warning
       // even though switch is in fact exhaustive
+      default:
+        return null;
     }
   }
 
