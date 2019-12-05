@@ -35,8 +35,7 @@ class PeripheralDetailsView extends StatelessWidget {
           titleIcon: Icons.perm_device_information,
           titleColor: Theme.of(context).primaryColor,
           value: state.peripheral.id,
-          accessory: _buildConnectionButtons(context, peripheralDetailsBloc),
-          accessoryPosition: PropertyRowAccessoryPosition.titleRow,
+          rowAccessory: _buildConnectionButtons(context, peripheralDetailsBloc),
         );
       },
     );

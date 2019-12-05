@@ -9,8 +9,13 @@ class PeripheralDetailsBloc
     extends Bloc<PeripheralDetailsEvent, PeripheralDetailsState> {
   BleAdapter _bleAdapter;
   final BlePeripheral _chosenPeripheral;
+  StreamSubscription _peripheralConnectionSubscription;
 
-  PeripheralDetailsBloc(this._bleAdapter, this._chosenPeripheral);
+  PeripheralDetailsBloc(this._bleAdapter, this._chosenPeripheral) {
+    _peripheralConnectionSubscription = _bleAdapter
+        .observePeripheralConnection(_chosenPeripheral.id)
+        .listen((connectionState) {});
+  }
 
   @override
   PeripheralDetailsState get initialState =>
@@ -49,5 +54,11 @@ class PeripheralDetailsBloc
     } on Error {
       // TODO: - Error handling
     }
+  }
+
+  @override
+  Future<void> close() {
+    _peripheralConnectionSubscription.cancel();
+    return super.close();
   }
 }

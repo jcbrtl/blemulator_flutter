@@ -37,7 +37,7 @@ class BleAdapter {
   }
 
   BleAdapter._internal(this._bleManager, this._blemulator) {
-//    _setupSimulation();
+    _setupSimulation();
     _bleManager.createClient();
   }
 
@@ -48,7 +48,8 @@ class BleAdapter {
         (_) => scanResult,
         ifAbsent: () => scanResult,
       );
-      return BlePeripheral.fromScanResult(scanResult);;
+      return BlePeripheral.fromScanResult(scanResult);
+      ;
     });
   }
 
@@ -68,8 +69,11 @@ class BleAdapter {
     return _scanResults[peripheralId].peripheral.isConnected();
   }
 
-  Stream<PeripheralConnectionState> observePeripheralConnection(String peripheralId) {
-    return _scanResults[peripheralId].peripheral.observeConnectionState(emitCurrentValue: true);
+  Stream<PeripheralConnectionState> observePeripheralConnection(
+      String peripheralId) {
+    return _scanResults[peripheralId]
+        .peripheral
+        .observeConnectionState(emitCurrentValue: true);
   }
 
   void _setupSimulation() {
