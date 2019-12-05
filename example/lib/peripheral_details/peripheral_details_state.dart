@@ -10,3 +10,14 @@ class PeripheralDetailsState extends Equatable {
   @override
   List<Object> get props => [peripheral];
 }
+
+class PeripheralDetailsErrorState extends PeripheralDetailsState {
+  final String errorMessage;
+
+  const PeripheralDetailsErrorState(
+      {@required BlePeripheral peripheral, this.errorMessage})
+      : super(peripheral: peripheral);
+
+  @override
+  List<Object> get props => [];
+}

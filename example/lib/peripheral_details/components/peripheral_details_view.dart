@@ -12,20 +12,48 @@ class PeripheralDetailsView extends StatelessWidget {
     final PeripheralDetailsBloc peripheralDetailsBloc =
         BlocProvider.of<PeripheralDetailsBloc>(context);
 
-    return BlocListener<PeripheralDetailsBloc, PeripheralDetailsState>(
-      condition: (previousState, state) {
-        return previousState.peripheral.connectionState !=
-            state.peripheral.connectionState;
-      },
-      listener: (context, state) {
-        Scaffold.of(context).removeCurrentSnackBar();
-        Scaffold.of(context).showSnackBar(
-          SnackBar(
-            content: Text(PeripheralConnectionStateStringifier.description(
-                state.peripheral.connectionState)),
-          ),
-        );
-      },
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<PeripheralDetailsBloc, PeripheralDetailsState>(
+          condition: (previousState, state) {
+            return previousState.peripheral.connectionState !=
+                state.peripheral.connectionState;
+          },
+          listener: (context, state) {
+            Scaffold.of(context).removeCurrentSnackBar();
+            Scaffold.of(context).showSnackBar(
+              SnackBar(
+                content: Text(PeripheralConnectionStateStringifier.description(
+                    state.peripheral.connectionState)),
+              ),
+            );
+          },
+        ),
+        BlocListener<PeripheralDetailsBloc, PeripheralDetailsState>(
+          condition: (_, state) {
+            return (state is PeripheralDetailsErrorState);
+          },
+          listener: (context, state) {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return SimpleDialog(
+                  title:
+                      Text((state as PeripheralDetailsErrorState).errorMessage),
+                  children: <Widget>[
+                    SimpleDialogOption(
+                      child: Text('OK'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    )
+                  ],
+                );
+              },
+            );
+          },
+        ),
+      ],
       child: CustomScrollView(
         slivers: <Widget>[
           SliverSafeArea(
@@ -51,7 +79,8 @@ class PeripheralDetailsView extends StatelessWidget {
           titleIcon: Icons.perm_device_information,
           titleColor: Theme.of(context).primaryColor,
           value: state.peripheral.id,
-          titleAccessory: _buildConnectionButtons(context, peripheralDetailsBloc),
+          titleAccessory:
+              _buildConnectionButtons(context, peripheralDetailsBloc),
         );
       },
     );

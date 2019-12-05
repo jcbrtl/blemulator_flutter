@@ -50,8 +50,8 @@ class PeripheralDetailsBloc
     try {
       await _bleAdapter.connectToPeripheral(state.peripheral.id);
       return PeripheralDetailsState(peripheral: state.peripheral);
-    } on Error {
-      // TODO: - Error handling
+    } on BleError catch (bleError) {
+      return _mapBleErrorToState(bleError);
     }
   }
 
@@ -60,8 +60,8 @@ class PeripheralDetailsBloc
     try {
       await _bleAdapter.disconnectFromPeripheral(state.peripheral.id);
       return PeripheralDetailsState(peripheral: state.peripheral);
-    } on Error {
-      // TODO: - Error handling
+    } on BleError catch (bleError) {
+      return _mapBleErrorToState(bleError);
     }
   }
 
@@ -70,6 +70,14 @@ class PeripheralDetailsBloc
     return PeripheralDetailsState(
         peripheral:
             state.peripheral.copyWith(connectionState: event.connectionState));
+  }
+
+  PeripheralDetailsErrorState _mapBleErrorToState(BleError bleError) {
+    return PeripheralDetailsErrorState(
+      peripheral: state.peripheral,
+      errorMessage:
+          'BleError with code ${bleError.errorCode.value.toString()} has occured',
+    );
   }
 
   @override
