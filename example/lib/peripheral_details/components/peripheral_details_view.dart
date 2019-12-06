@@ -1,7 +1,6 @@
 import 'package:blemulator_example/peripheral_details/bloc.dart';
 import 'package:blemulator_example/peripheral_details/components/property_row.dart';
 import 'package:blemulator_example/styles/custom_text_style.dart';
-import 'package:blemulator_example/util/peripheral_connection_state_stringifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_ble_lib/flutter_ble_lib.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,7 +22,7 @@ class PeripheralDetailsView extends StatelessWidget {
             Scaffold.of(context).removeCurrentSnackBar();
             Scaffold.of(context).showSnackBar(
               SnackBar(
-                content: Text(PeripheralConnectionStateStringifier.description(
+                content: Text(_connectionStateDescription(
                     state.peripheral.connectionState)),
               ),
             );
@@ -39,8 +38,7 @@ class PeripheralDetailsView extends StatelessWidget {
               builder: (context) {
                 final errorState = state as PeripheralDetailsErrorState;
                 return SimpleDialog(
-                  title:
-                      Text(errorState.errorMessage),
+                  title: Text(errorState.errorMessage),
                   children: <Widget>[
                     SimpleDialogOption(
                       child: Text('OK'),
@@ -138,6 +136,22 @@ class PeripheralDetailsView extends StatelessWidget {
       // even though switch is in fact exhaustive
       default:
         return null;
+    }
+  }
+
+  String _connectionStateDescription(
+      PeripheralConnectionState connectionState) {
+    switch (connectionState) {
+      case PeripheralConnectionState.connecting:
+        return 'Connecting to peripheral';
+      case PeripheralConnectionState.connected:
+        return 'Peripheral connected';
+      case PeripheralConnectionState.disconnecting:
+        return 'Disconnecting from peripheral';
+      case PeripheralConnectionState.disconnected:
+        return 'Peripheral disconnected';
+      default:
+        return 'Unknown';
     }
   }
 
