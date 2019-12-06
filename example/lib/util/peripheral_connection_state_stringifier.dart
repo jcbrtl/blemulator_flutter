@@ -6,11 +6,11 @@ class PeripheralConnectionStateStringifier {
       case PeripheralConnectionState.connecting:
         return 'Connecting to peripheral';
       case PeripheralConnectionState.connected:
-        return 'Connected to peripheral';
+        return 'Peripheral connected';
       case PeripheralConnectionState.disconnecting:
         return 'Disconnecting from peripheral';
       case PeripheralConnectionState.disconnected:
-        return 'Disconneced from peripheral';
+        return 'Peripheral disconnected';
       default:
         return 'Unknown';
     }
