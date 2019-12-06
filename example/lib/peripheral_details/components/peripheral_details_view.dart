@@ -79,13 +79,13 @@ class PeripheralDetailsView extends StatelessWidget {
           titleColor: Theme.of(context).primaryColor,
           value: state.peripheral.id,
           titleAccessory:
-              _buildConnectionButtons(context, peripheralDetailsBloc),
+              _buildConnectionButton(context, peripheralDetailsBloc),
         );
       },
     );
   }
 
-  Widget _buildConnectionButtons(
+  Widget _buildConnectionButton(
       BuildContext context, PeripheralDetailsBloc peripheralDetailsBloc) {
     return BlocBuilder<PeripheralDetailsBloc, PeripheralDetailsState>(
       builder: (context, state) {
